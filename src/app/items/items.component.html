@@ -1,0 +1,103 @@
+<div class="container items-page">
+  <div class="page-header">
+    <h1>Task list</h1>
+    <p class="text-muted">MEAN stack CRUD: Angular, Express, MongoDB, Node.</p>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-danger" role="alert">{{ error() }}</div>
+  }
+
+  <div class="row">
+    <div class="col-md-5">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">{{ editingId() ? 'Edit item' : 'New item' }}</h3>
+        </div>
+        <div class="panel-body">
+          <form [formGroup]="form" (ngSubmit)="submit()">
+            <div class="form-group">
+              <label for="title">Title</label>
+              <input
+                id="title"
+                class="form-control"
+                type="text"
+                formControlName="title"
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea
+                id="description"
+                class="form-control"
+                rows="3"
+                formControlName="description"
+              ></textarea>
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" formControlName="done" />
+                Done
+              </label>
+            </div>
+            <div class="btn-row">
+              <button type="submit" class="btn btn-primary" [disabled]="form.invalid || loading()">
+                {{ editingId() ? 'Save changes' : 'Create' }}
+              </button>
+              @if (editingId()) {
+                <button type="button" class="btn btn-default" (click)="cancelEdit()">Cancel</button>
+              }
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-7">
+      <div class="panel panel-default">
+        <div class="panel-heading clearfix">
+          <h3 class="panel-title pull-left">All tasks</h3>
+          <button
+            type="button"
+            class="btn btn-sm btn-default pull-right"
+            (click)="load()"
+            [disabled]="loading()"
+          >
+            Refresh
+          </button>
+        </div>
+        <ul class="list-group">
+          @if (loading() && items().length === 0) {
+            <li class="list-group-item text-muted">Loading…</li>
+          }
+          @for (item of items(); track item._id) {
+            <li class="list-group-item">
+              <div class="item-head">
+                <strong [class.done]="item.done">{{ item.title }}</strong>
+                <span class="label" [class.label-success]="item.done" [class.label-default]="!item.done">
+                  {{ item.done ? 'Done' : 'Open' }}
+                </span>
+              </div>
+              @if (item.description) {
+                <p class="item-desc">{{ item.description }}</p>
+              }
+              <div class="item-actions">
+                <button type="button" class="btn btn-xs btn-primary" (click)="startEdit(item)">
+                  Edit
+                </button>
+                <button type="button" class="btn btn-xs btn-danger" (click)="remove(item._id)">
+                  Delete
+                </button>
+              </div>
+            </li>
+          } @empty {
+            @if (!loading()) {
+              <li class="list-group-item text-muted">No tasks yet. Add one on the left.</li>
+            }
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
